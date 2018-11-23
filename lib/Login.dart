@@ -24,16 +24,19 @@ class LoginPage extends StatelessWidget
             ),
             
             new Container(
-            padding: EdgeInsets.symmetric(vertical: 8.0,horizontal: 15.0),
+            padding: EdgeInsets.symmetric(vertical: 15.0,horizontal: 15.0),
             margin: EdgeInsets.symmetric(vertical:18.0, horizontal: 25.0),
             child: new Column(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
 
-                new Text('Nearway', style: TextStyle(color: Colors.black54, fontSize: 60.0, fontWeight: FontWeight.w300)),
+                new Padding(
+                  padding: const EdgeInsets.only(bottom: 25.0),
+                  child: new Text('Nearway', style: TextStyle(color: Colors.black54, fontSize: 60.0, fontWeight: FontWeight.w300)),
+                ),
 
-                new Padding(padding: EdgeInsets.only(top:35.0)),
+                new Padding(padding: EdgeInsets.only(top:100.0)),
 
 
                 new RawMaterialButton(
@@ -72,7 +75,7 @@ class LoginPage extends StatelessWidget
                   ),
                 ),
 
-                new Padding(padding: EdgeInsets.all(2.0)),
+                new Padding(padding: EdgeInsets.all(8.0)),
 
                 new RawMaterialButton(
                   elevation: 4.0,
