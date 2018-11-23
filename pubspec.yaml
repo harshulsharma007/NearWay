@@ -24,6 +24,8 @@ dependencies:
   location: ^1.4.1
   http: ^0.12.0
   cached_network_image:
+  fluttertoast: ^2.0.7
+  intl: ^0.15.7
   #google_maps_flutter:
    #git:
       #url: "git://githib.com/flutter/plugins"

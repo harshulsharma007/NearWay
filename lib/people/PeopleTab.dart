@@ -54,7 +54,8 @@ class PeopleTabState extends State<PeopleTab> {
                         subtitle: Text('message'),
                         onTap: () {
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => chatDetail()));
+                              builder: (context) =>
+                                  Chat(peerName: document['name'],peerId: document['id'],peerAvatar: document['photourl'],)));
                         },
                       ));
                 }).toList());

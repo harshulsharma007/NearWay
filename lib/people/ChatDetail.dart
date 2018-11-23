@@ -2,22 +2,106 @@ import 'package:flutter/material.dart';
 import 'package:near_way/people/ChatMessage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 
-class chatDetail extends StatefulWidget {
+class Chat extends StatelessWidget {
+
+  final String peerName;
+  final String peerId;
+  final String peerAvatar;
+
+  Chat({Key key, @required this.peerName, @required this.peerId, @required this.peerAvatar}) : super(key: key);
+
   @override
-  chatDetailState createState() => new chatDetailState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: new AppBar(
+        title: Text(peerName),
+        centerTitle: true,
+      ),
+      body: ChatScreen(peerId: peerId, peerAvatar: peerAvatar),
+    );
+  }
 }
 
-class chatDetailState extends State<chatDetail> {
+class ChatScreen extends StatefulWidget {
+  final String peerId;
+  final String peerAvatar;
 
-  String userid;
+  ChatScreen({Key key, @required this.peerId, @required this.peerAvatar}) : super(key: key);
+
+  @override
+  ChatScreenState createState() => new ChatScreenState(peerId: peerId, peerAvatar: peerAvatar);
+}
+
+class ChatScreenState extends State<ChatScreen> {
+  ChatScreenState({Key key, @required this.peerId, @required this.peerAvatar});
+
+  String peerId;
+  String peerAvatar;
+  String id;
   var listmessage;
+  String ChatId;
+  bool isLoading;
 
-  final TextEditingController _textEditingController =
-      new TextEditingController();
-  final List<ChatMessage> _messages = <ChatMessage>[];
+  final TextEditingController _textEditingController = new TextEditingController();
+  final ScrollController listScrollController = new ScrollController();
+  //final List<ChatMessage> _messages = <ChatMessage>[];
 
-  void _handleSubmitted(String text) {
+  @override
+  void initState(){
+    super.initState();
+
+    ChatId = '';
+    isLoading = false;
+
+    readLocal();
+  }
+
+  readLocal() async{
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    if(user!=null){
+      id = user.uid;
+    }
+    if(id.hashCode <= peerId.hashCode){
+      ChatId = '$id-$peerId';
+    } else {
+      ChatId = '$peerId-$id';
+    }
+    setState(() {});
+  }
+
+  void onSendMessage(String content){
+
+    if(content.trim() != '') {
+      _textEditingController.clear();
+
+      var documentReference = Firestore.instance
+          .collection('messages')
+          .document(ChatId)
+          .collection(ChatId)
+          .document(DateTime.now().millisecondsSinceEpoch.toString());
+
+      Firestore.instance.runTransaction((transaction) async {
+        await transaction.set(
+          documentReference,
+          {
+            'idFrom' : id,
+            'idTo' : peerId,
+            'timestamp' : DateTime.now().millisecondsSinceEpoch.toString(),
+            'content' : content
+          },
+        );
+      });
+      listScrollController.animateTo(0.0, duration: Duration(microseconds: 300), curve: Curves.easeOut);
+    } else {
+      Fluttertoast.showToast(msg: 'Nothing to send');
+    }
+  }
+
+  /*void _handleSubmitted(String text) {
     _textEditingController.clear();
 
     ChatMessage message = new ChatMessage(text: text);
@@ -25,7 +109,7 @@ class chatDetailState extends State<chatDetail> {
     setState(() {
       _messages.insert(_messages.length, message);
     });
-  }
+  }*/
 
   Widget _textComposerWidget() {
     return IconTheme(
@@ -46,17 +130,19 @@ class chatDetailState extends State<chatDetail> {
                               BorderRadius.all(Radius.circular(18.0))),
                       contentPadding:
                           EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0)),
-                  onSubmitted: _handleSubmitted,
                   maxLines: null,
                   textCapitalization: TextCapitalization.sentences,
                 ),
               ),
-              new Container(
-                margin: EdgeInsets.symmetric(horizontal: 4.0),
-                child: IconButton(
+              Material(
+                child: new Container(
+                  margin: EdgeInsets.symmetric(horizontal: 4.0),
+                  child: IconButton(
                     icon: Icon(Icons.send),
-                    onPressed: () =>
-                        _handleSubmitted(_textEditingController.text)),
+                    onPressed: (){ onSendMessage(_textEditingController.text );},
+                    color: Color(0xff203152)
+                  ),
+                ),
               )
             ],
           ),
@@ -64,7 +150,7 @@ class chatDetailState extends State<chatDetail> {
   }
 
   bool isLastMessageRight(int index){
-    if((index > 0 && listmessage!=null && listmessage[index-1]['id'] != userid) || index == 0){
+    if((index > 0 && listmessage!=null && listmessage[index-1]['idFrom'] != id) || index == 0){
       return true;
     }else {
       return false;
@@ -72,7 +158,7 @@ class chatDetailState extends State<chatDetail> {
   }
 
   bool isLastMessageLeft(int index){
-    if((index > 0 && listmessage!=null && listmessage[index-1]['id'] == userid) || index == 0){
+    if((index > 0 && listmessage!=null && listmessage[index-1]['idFrom'] == id) || index == 0){
       return true;
     }else {
       return false;
@@ -80,7 +166,7 @@ class chatDetailState extends State<chatDetail> {
   }
 
   Widget buildItem(int index, DocumentSnapshot document){
-    if(document['id']==userid){
+    if(document['idFrom']==id){
       return Row(
         children: <Widget>[
           Container(
@@ -120,7 +206,7 @@ class chatDetailState extends State<chatDetail> {
                       height: 35.0,
                       padding: EdgeInsets.all(10.0),
                     ),
-                    imageUrl: imageurl,
+                    imageUrl: peerAvatar,
                     width: 35.0,
                     height: 35.0,
                     fit: BoxFit.cover,
@@ -146,33 +232,97 @@ class chatDetailState extends State<chatDetail> {
                   ),
                   margin: EdgeInsets.only(left: 10.0),
                 )
-
               ],
+            ),
+
+            isLastMessageLeft(index)
+              ? Container(
+              child: Text(
+                DateFormat('dd MMM kk:mm').format(DateTime.fromMillisecondsSinceEpoch(int.parse(document['timestamp']))),
+                style: TextStyle(color: Color(0xffaeaeae), fontSize: 12.0, fontStyle: FontStyle.italic),
+              ),
+              margin: EdgeInsets.only(left:50.0, top:5.0, bottom:5.0),
             )
+                :
+                Container()
           ],
+          crossAxisAlignment: CrossAxisAlignment.start,
         ),
-      )
+        margin: EdgeInsets.only(bottom: 10.0),
+      );
     }
+  }
+
+  Widget buildListMessage(){
+    return Flexible(
+      child: ChatId==''
+          ? Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xfff5a623)),
+              ),
+      ):
+          StreamBuilder(
+            stream: Firestore.instance
+                .collection('messages')
+                .document(ChatId)
+                .collection(ChatId)
+                .orderBy('timestamp', descending: true)
+                .limit(20)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if(!snapshot.hasData){
+                return Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xfff5a623)),
+                  ),
+                );
+              } else {
+                listmessage = snapshot.data.documents;
+                return ListView.builder(
+                    padding: EdgeInsets.all(10.0),
+                    itemBuilder: (context, index) {
+                      return buildItem(index, snapshot.data.documents[index]);
+                    },
+                    itemCount: snapshot.data.documents.length,
+                  reverse: true,
+                  controller: listScrollController,
+                );
+              }
+            },
+          )
+    );
+  }
+
+  Widget buildLoading(){
+    return Positioned(
+      child: isLoading ?
+      Container(
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xfff5a623)),
+          ),
+        ),
+        color:  Colors.white.withOpacity(0.8),
+      ):
+          Container()
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: <Widget>[
-          new Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(15.0),
-              itemBuilder: (context, int index) => _messages[index],
-              itemCount: _messages.length,
-            ),
-          ),
-          new Divider(height: 1.0),
-          new Container(
-            child: _textComposerWidget(),
-          )
-        ],
-      ),
+    return Stack(
+      children: <Widget>[
+        Column(
+          children: <Widget>[
+
+            buildListMessage(),
+
+            _textComposerWidget(),
+          ],
+        ),
+
+        buildLoading()
+      ],
     );
   }
 }
