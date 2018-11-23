@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:near_way/AuthStore.dart';
 import 'package:near_way/EditProfile.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'Login.dart';
 
-var imageurl = 'https://images.pexels.com/photos/41008/cowboy-ronald-reagan-cowboy-hat-hat-41008.jpeg?auto=compress&cs=tinysrgb&h=650&w=940';
+
 class ProfileTab extends StatefulWidget
 {
   final String uid;
@@ -14,10 +16,31 @@ class ProfileTab extends StatefulWidget
 
 class ProfileTabState extends State<ProfileTab>
 {
+  String imageurl;
+  String name;
+  String email;
+  final String uid;
+
+  ProfileTabState({Key key, @required this.uid});
+
+  Future<void> read() async{
+      final DocumentSnapshot documentSnapshot = await Firestore.instance.collection("users").document(uid).get();
+      if(documentSnapshot!=null){
+        setState(() {
+          imageurl = documentSnapshot['photourl'];
+          name = documentSnapshot['name'];
+          email = documentSnapshot['email'];
+        });
+      }
+  }
+
+  @override
+  void initState(){
+    super.initState();
+    read();
+  }
 
   AuthStore _authStore = new AuthStore();
-  ProfileTabState({Key key, @required this.uid});
-  final String uid;
 
   @override
   Widget build(BuildContext context) {
@@ -25,15 +48,15 @@ class ProfileTabState extends State<ProfileTab>
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.black),
         backgroundColor: Colors.white,
-        title: Text('username', style: TextStyle(fontStyle: FontStyle.italic, fontSize: 25.0, color: Colors.black)),
+        title: Text(name, style: TextStyle(fontStyle: FontStyle.italic, fontSize: 25.0, color: Colors.black)),
       ),
       drawer: new Drawer(
         child: ListView(
           children: <Widget>[
             new UserAccountsDrawerHeader(
               decoration: BoxDecoration(color: Colors.black.withOpacity(.8)),
-              accountName: new Text('Harshul Sharma'),
-              accountEmail: new Text('My-email'),
+              accountName: new Text(name),
+              accountEmail: new Text(email),
               currentAccountPicture: new CircleAvatar(
                 backgroundImage: new NetworkImage(imageurl),
               ),
@@ -93,7 +116,7 @@ class ProfileTabState extends State<ProfileTab>
 
                 SizedBox(height: 25.0),
 
-                Text("Harshul Sharma", style: TextStyle(fontSize: 25.0)),
+                Text(name, style: TextStyle(fontSize: 25.0)),
 
                 SizedBox(height: 30.0),
 

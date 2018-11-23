@@ -8,7 +8,6 @@ import 'Places_Tab.dart';
 import 'package:location/location.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:near_way/AuthStore.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -38,6 +37,7 @@ class HomePageState extends State<HomePage> {
         'name' : currentuser.displayName,
         'photourl' : currentuser.photoUrl,
         'id' : currentuser.uid,
+        'email' : currentuser.email,
       });
     }
     setState(() {

@@ -33,7 +33,9 @@ class LoginPage extends StatelessWidget
 
                 new Padding(
                   padding: const EdgeInsets.only(bottom: 25.0),
-                  child: new Text('Nearway', style: TextStyle(color: Colors.black54, fontSize: 60.0, fontWeight: FontWeight.w300)),
+                  child: Image(
+                    image: AssetImage("assets/Nearway.png"),
+                  )//Text('Nearway', style: TextStyle(color: Colors.black54, fontSize: 60.0, fontWeight: FontWeight.w300)),
                 ),
 
                 new Padding(padding: EdgeInsets.only(top:100.0)),
