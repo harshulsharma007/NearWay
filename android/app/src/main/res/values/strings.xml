@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NearWay</string>
+    <string name="facebook_app_id">364474967457545</string>
+    <string name="fb_login_protocol_scheme">fb364474967457545</string>
+</resources>
