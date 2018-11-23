@@ -3,10 +3,6 @@ import 'chat_message.dart';
 
 class chatDetail extends StatefulWidget
 {
-  final int data;
-
-  chatDetail(this.data);
-
   @override
   chatDetailState createState() => new chatDetailState();
 }
@@ -47,7 +43,6 @@ class chatDetailState extends State<chatDetail>
                   ),
                   onSubmitted: _handleSubmitted,
                   maxLines: null,
-                  textInputAction: TextInputAction.continueAction,
                   textCapitalization: TextCapitalization.sentences,
 
                 ),
@@ -65,22 +60,24 @@ class chatDetailState extends State<chatDetail>
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        new Flexible(
-          child: ListView.builder(
-            padding: const EdgeInsets.all(15.0),
-            itemBuilder: (context, int index)=> _messages[index],
-            itemCount: _messages.length,
+    return Scaffold(
+      body: Column(
+        children: <Widget>[
+          new Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(15.0),
+              itemBuilder: (context, int index)=> _messages[index],
+              itemCount: _messages.length,
+            ),
           ),
-        ),
 
-        new Divider(height: 1.0),
+          new Divider(height: 1.0),
 
-        new Container(
-          child: _textComposerWidget(),
-        )
-      ],
+          new Container(
+            child: _textComposerWidget(),
+          )
+        ],
+      ),
     );
   }
 

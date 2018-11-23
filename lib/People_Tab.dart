@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'chat.dart';
 import 'chat_detail.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -51,6 +50,7 @@ class PeopleTabState extends State<PeopleTab>
                         title: Text(document['name']),
                         subtitle: Text('message'),
                         onTap: (){
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => chatDetail()));
                         },
                       )
                   );

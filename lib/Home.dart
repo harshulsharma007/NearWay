@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'Home_Tab.dart';
 import 'People_Tab.dart';
-import 'chat.dart';
 import 'Profile_Tab.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'Places_Tab.dart';
@@ -38,6 +37,8 @@ class HomePageState extends State<HomePage> {
         'photourl' : currentuser.photoUrl,
         'id' : currentuser.uid,
         'email' : currentuser.email,
+        'friends' : null,
+        'friend_request' : null,
       });
     }
     setState(() {
