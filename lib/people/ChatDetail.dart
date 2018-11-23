@@ -1,31 +1,27 @@
 import 'package:flutter/material.dart';
-import 'chat_message.dart';
+import 'package:near_way/people/ChatMessage.dart';
 
-class chatDetail extends StatefulWidget
-{
+class chatDetail extends StatefulWidget {
   @override
   chatDetailState createState() => new chatDetailState();
 }
 
-class chatDetailState extends State<chatDetail>
-{
-  final TextEditingController _textEditingController = new TextEditingController();
+class chatDetailState extends State<chatDetail> {
+  final TextEditingController _textEditingController =
+      new TextEditingController();
   final List<ChatMessage> _messages = <ChatMessage>[];
 
-  void _handleSubmitted(String text)
-  {
+  void _handleSubmitted(String text) {
     _textEditingController.clear();
 
-    ChatMessage message = new ChatMessage(
-        text: text
-    );
+    ChatMessage message = new ChatMessage(text: text);
 
     setState(() {
-      _messages.insert(_messages.length,message);
+      _messages.insert(_messages.length, message);
     });
   }
 
-  Widget _textComposerWidget(){
+  Widget _textComposerWidget() {
     return IconTheme(
         data: IconThemeData(color: Colors.grey),
         child: Container(
@@ -33,29 +29,32 @@ class chatDetailState extends State<chatDetail>
           child: Row(
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
-
               new Flexible(
                 child: TextField(
                   controller: _textEditingController,
-                  decoration: InputDecoration(hintText: 'message...',
-                      border: OutlineInputBorder(borderSide: BorderSide(), borderRadius: BorderRadius.all(Radius.circular(18.0))),
-                      contentPadding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0)
-                  ),
+                  decoration: InputDecoration(
+                      hintText: 'message...',
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(),
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(18.0))),
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0)),
                   onSubmitted: _handleSubmitted,
                   maxLines: null,
                   textCapitalization: TextCapitalization.sentences,
-
                 ),
               ),
-
               new Container(
                 margin: EdgeInsets.symmetric(horizontal: 4.0),
-                child: IconButton(icon: Icon(Icons.send), onPressed: () => _handleSubmitted(_textEditingController.text)),
+                child: IconButton(
+                    icon: Icon(Icons.send),
+                    onPressed: () =>
+                        _handleSubmitted(_textEditingController.text)),
               )
             ],
           ),
-        )
-    );
+        ));
   }
 
   @override
@@ -66,13 +65,11 @@ class chatDetailState extends State<chatDetail>
           new Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(15.0),
-              itemBuilder: (context, int index)=> _messages[index],
+              itemBuilder: (context, int index) => _messages[index],
               itemCount: _messages.length,
             ),
           ),
-
           new Divider(height: 1.0),
-
           new Container(
             child: _textComposerWidget(),
           )
@@ -80,5 +77,4 @@ class chatDetailState extends State<chatDetail>
       ),
     );
   }
-
 }

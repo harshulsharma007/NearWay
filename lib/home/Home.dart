@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'Home_Tab.dart';
-import 'People_Tab.dart';
-import 'Profile_Tab.dart';
+import 'HomeTab.dart';
+import '../people/PeopleTab.dart';
+import 'package:near_way/profile/ProfileTab.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'Places_Tab.dart';
-import 'package:location/location.dart';
+import '../places/PlacesTab.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 

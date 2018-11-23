@@ -1,6 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'PlaceModel.dart';
+import 'package:near_way/places/PlaceModel.dart';
 import 'dart:async';
 
 class LocationService

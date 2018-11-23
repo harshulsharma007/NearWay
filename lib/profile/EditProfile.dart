@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-class EditProfile extends StatefulWidget
-{
+class EditProfile extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     return EditProfileState();
