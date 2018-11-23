@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import 'chat.dart';
 import 'chat_detail.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 
 class PeopleTab extends StatefulWidget
 {
   @override
   PeopleTabState createState() => new PeopleTabState();
-
-
 }
 
 class PeopleTabState extends State<PeopleTab>
@@ -42,21 +39,23 @@ class PeopleTabState extends State<PeopleTab>
         builder: (context, snapshot) {
           if(snapshot.hasError) return Text('Error: ${snapshot.error}');
           switch(snapshot.connectionState) {
-            case ConnectionState.waiting: return new Text('Loading');
-            default: return ListView(
+            case ConnectionState.waiting: return new Text('Loading...');
+            default:
+              return ListView(
                 children: snapshot.data.documents.map((DocumentSnapshot document) {
                   return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 0.0),
                       child: ListTile(
                         leading: new CircleAvatar(child: Text(document['name'][0])),
-                        contentPadding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
-                        title: Text(document['friends']),
+                        contentPadding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0),
+                        title: Text(document['name']),
                         subtitle: Text('message'),
                         onTap: (){
                         },
                       )
                   );
-                }).toList());
+                }).toList()
+            );
           }
         },
       )/*ChatListWidget(10, (value){

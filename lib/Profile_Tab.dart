@@ -6,13 +6,18 @@ import 'Login.dart';
 var imageurl = 'https://images.pexels.com/photos/41008/cowboy-ronald-reagan-cowboy-hat-hat-41008.jpeg?auto=compress&cs=tinysrgb&h=650&w=940';
 class ProfileTab extends StatefulWidget
 {
+  final String uid;
+  ProfileTab({Key key, @required this.uid}) : super(key: key);
   @override
-  ProfileTabState createState() => new ProfileTabState();
+  ProfileTabState createState() => new ProfileTabState(uid: uid);
 }
 
 class ProfileTabState extends State<ProfileTab>
 {
-  final AuthStore _authStore = new AuthStore();
+
+  AuthStore _authStore = new AuthStore();
+  ProfileTabState({Key key, @required this.uid});
+  final String uid;
 
   @override
   Widget build(BuildContext context) {

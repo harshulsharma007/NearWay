@@ -8,6 +8,7 @@ import 'Places_Tab.dart';
 import 'package:location/location.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:near_way/AuthStore.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -15,15 +16,50 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
+
+  String uid;
+  bool isLoading = false;
+
+  Future<void> handleUser() async {
+    this.setState((){
+      isLoading = true;
+    });
+
+    FirebaseUser currentuser = await FirebaseAuth.instance.currentUser();
+
+    final QuerySnapshot result = await Firestore.instance.collection('users').where('id', isEqualTo: currentuser.uid).getDocuments();
+    final List<DocumentSnapshot> documents = result.documents;
+
+    if(documents.length ==0 ) {
+      Firestore.instance
+          .collection('users')
+          .document(currentuser.uid)
+          .setData({
+        'name' : currentuser.displayName,
+        'photourl' : currentuser.photoUrl,
+        'id' : currentuser.uid,
+      });
+    }
+    setState(() {
+      uid = currentuser.uid;
+      isLoading = false;
+      print("Waaaaaaaahhhhhhhhhhhhhhh");
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    handleUser();
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        home: new DefaultTabController(
+        home: isLoading ? Center(
+          child: CircularProgressIndicator()
+        ) :
+        new DefaultTabController(
             length: 4,
             child: new Scaffold(
               bottomNavigationBar: Theme(
@@ -63,7 +99,7 @@ class HomePageState extends State<HomePage> {
                   HomeTab(),
                   PeopleTab(),
                   PlacesTab(),
-                  ProfileTab()
+                  ProfileTab(uid : this.uid)
                 ],
               ),
             )));

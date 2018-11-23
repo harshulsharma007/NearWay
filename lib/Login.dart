@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:carousel_pro/carousel_pro.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:near_way/AuthStore.dart';
@@ -34,28 +33,8 @@ class LoginPage extends StatelessWidget
 
                 new Text('Nearway', style: TextStyle(color: Colors.black54, fontSize: 60.0, fontWeight: FontWeight.w300)),
 
-                new Padding(padding: EdgeInsets.only(top:10.0)),
+                new Padding(padding: EdgeInsets.only(top:35.0)),
 
-                new Expanded(
-                    child: new Carousel(
-                      boxFit: BoxFit.cover,
-                      autoplay: false,
-                      images: [
-                        AssetImage("assets/image1.jpg"),
-                        AssetImage("assets/image2.jpg"),
-                        AssetImage("assets/image3.jpg"),
-                        AssetImage("assets/image4.jpg"),
-                      ],
-                      showIndicator: true,
-                      indicatorBgPadding: 5.0,
-                      animationCurve: Curves.fastOutSlowIn,
-                      animationDuration: Duration(milliseconds: 1000),
-                      dotSize: 5.0,
-                      dotColor: Colors.red,
-                    )
-                ),
-
-                new Padding(padding: EdgeInsets.only(top:15.0)),
 
                 new RawMaterialButton(
                   elevation: 4.0,
@@ -73,29 +52,9 @@ class LoginPage extends StatelessWidget
                               print('Signed in as ${signedInUser.displayName}');
                               Navigator.pushAndRemoveUntil(context,
                                   MaterialPageRoute(builder: (context) => HomePage()), (Route<dynamic> route) => false);
-
-                              FirebaseAuth.instance.currentUser().then((onValue) {
-                                var x = onValue.displayName;
-                                onValue.uid;
-                                print(x);
-
-
-
-                              });
                         }).catchError((e) {
                           print(e);
                         });break;
-
-                        case FacebookLoginStatus.cancelledByUser:
-                          FirebaseAuth.instance.signInWithFacebook(
-                              accessToken: result.accessToken.token)
-                              .then((signedInUser) {
-                            print('Signed in as ${signedInUser.displayName}');
-                            Navigator.pushAndRemoveUntil(context,
-                                MaterialPageRoute(builder: (context) => HomePage()), (Route<dynamic> route) => false);
-                          }).catchError((e) {
-                            print(e);
-                          });
                       }
                     }).catchError((e) {
                       print(e);
