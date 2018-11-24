@@ -4,9 +4,8 @@ import 'dart:io';
 import 'UploadPost.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:intl/intl.dart';
 
-var imageurl =
-    'https://images.pexels.com/photos/41008/cowboy-ronald-reagan-cowboy-hat-hat-41008.jpeg?auto=compress&cs=tinysrgb&h=650&w=940';
 bool temp = false;
 
 class HomeTab extends StatefulWidget {
@@ -29,6 +28,17 @@ class HomeTabState extends State<HomeTab> {
     }
   }
 
+  void onPressLike(String timestampid, bool alreadyliked, int likes){
+    var documentReference = Firestore.instance
+        .collection('posts')
+        .document('RH3X62bQw4lMYZwmLJTM').updateData({
+      'likes' : alreadyliked ? likes-1 : likes+1
+    }
+    );
+
+    temp = !temp;
+  }
+
   Widget buildPost(DocumentSnapshot document) {
     final bool alreadyLiked = temp;
 
@@ -38,25 +48,44 @@ class HomeTabState extends State<HomeTab> {
       ),
       width: MediaQueryData().size.width,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Row(
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
+
               Padding(
-                padding: EdgeInsets.all(10.0),
-                child: CircleAvatar(
-                  backgroundImage: NetworkImage(imageurl),
-                  radius: 20.0,
+                padding: const EdgeInsets.all(10.0),
+                child: Material(
+                  child: CachedNetworkImage(
+                    placeholder: Container(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 1.0,
+                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xfff5a623)),
+                      ),
+                      width: 35.0,
+                      height: 35.0,
+                      padding: EdgeInsets.all(10.0),
+                    ),
+                    imageUrl: document['user_image'],
+                    width: 35.0,
+                    height: 35.0,
+                    fit: BoxFit.cover,
+                  ),
+                  borderRadius: BorderRadius.all(
+                      Radius.circular(18.0)
+                  ),
+                  clipBehavior: Clip.hardEdge,
                 ),
               ),
-              Text('username', style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold),
+
+              Text(document['name'], style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold),
               )
             ],
           ),
 
           Image(
-              image: NetworkImage(imageurl)
+              image: NetworkImage(document['photo_url'])
           ),
 
           Row(
@@ -68,31 +97,34 @@ class HomeTabState extends State<HomeTab> {
                     icon: Icon(
                       alreadyLiked ? Icons.favorite : Icons.favorite_border,
                       color: alreadyLiked ? Colors.red : null,
-                      size: 30.0,
+                      size: 28.0,
                     ),
                     onPressed: () {
-                      setState(() {
-                        if (alreadyLiked) {
-                          temp = false;
-                        } else {
-                          temp = true;
-                        }
-                      });
+                      onPressLike(document['timestamp'], alreadyLiked, document['likes']);
+                      setState(() {});
                     }),
               ),
-              Text('25 likes', style: TextStyle(fontWeight: FontWeight.bold),
+              Text( document['likes'].toString() + ' likes' , style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ]
           ),
 
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 5.0),
-              child: Text('Location', style: TextStyle(fontWeight: FontWeight.bold))
+            padding: EdgeInsets.symmetric(horizontal: 15.0),
+              child: Text(document['place'], style: TextStyle(fontWeight: FontWeight.bold))
           ),
 
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 5.0),
-            child: Text('Captions captions Captions Captions Captions Captions Captions Captions'),
+            padding: EdgeInsets.symmetric(horizontal: 15.0,vertical: 2.0),
+            child: Text(document['caption']),
+          ),
+
+          Container(
+            child: Text(
+              DateFormat('dd MMM kk:mm').format(DateTime.fromMillisecondsSinceEpoch(int.parse(document['timestamp']))),
+              style: TextStyle(color: Color(0xffaeaeae), fontSize: 12.0, fontStyle: FontStyle.italic),
+            ),
+            margin: EdgeInsets.only(left:20.0, top:5.0, bottom:5.0),
           )
 
         ],
@@ -118,9 +150,9 @@ class HomeTabState extends State<HomeTab> {
 
   Widget buildListPosts(){
     return StreamBuilder(
-      stream: Firestore.instance.collection('posts').document().snapshots(),
-      builder: (context, snapshots) {
-        if(!snapshots.hasData) {
+      stream: Firestore.instance.collection('posts').orderBy('timestamp').snapshots(),
+      builder: (context, snapshot) {
+        if(!snapshot.hasData) {
           return Center(
             child: CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Color(0xfff5a623)),
@@ -129,9 +161,9 @@ class HomeTabState extends State<HomeTab> {
         } else {
           return ListView.builder(
             itemBuilder: (context, index) {
-              return buildPost(snapshots.data.document[index]);
+              return buildPost(snapshot.data.documents[index]);
             },
-            itemCount: snapshots.data.document.length,
+            itemCount: snapshot.data.documents.length,
           );
         }
       },

@@ -16,7 +16,7 @@ class LocationService
     return _locationService;
   }
 
-  static void set(double longitude, double latitude){
+  static void set(double longitude , double latitude){
     lon = longitude;
     lat = latitude;
   }
