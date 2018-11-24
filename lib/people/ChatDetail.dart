@@ -44,7 +44,7 @@ class ChatScreenState extends State<ChatScreen> {
   String id;
   var listmessage;
   String ChatId;
-  bool isLoading;
+  bool isLoading = true;
 
   final TextEditingController _textEditingController = new TextEditingController();
   final ScrollController listScrollController = new ScrollController();

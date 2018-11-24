@@ -36,8 +36,8 @@ class HomePageState extends State<HomePage> {
         'photourl' : currentuser.photoUrl,
         'id' : currentuser.uid,
         'email' : currentuser.email,
-        'friends' : null,
-        'friend_request' : null,
+        'friends' : <String> [],
+        'friend_request' : <String> [],
       });
     }
     setState(() {
